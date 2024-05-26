@@ -37,22 +37,19 @@
    </ul>
 </template>
 
-<script>
-export default {
-   props: {
-      contact: {
-         type: Object,
-      },
-      editing: {
-         type: Boolean,
-         default: true,
-      },
-      iconColor: {
-         type: String,
-         default: "#ffffff",
-      },
-   },
+<script setup lang="ts">
+import { defineProps } from "vue";
+import type { Contact } from "../types.ts";
+type Props = {
+   contact: Contact;
+   editing: boolean;
+   iconColor: string;
 };
+
+withDefaults(defineProps<Props>(), {
+   editing: true,
+   iconColor: "#ffffff",
+});
 </script>
 
 <style scoped>

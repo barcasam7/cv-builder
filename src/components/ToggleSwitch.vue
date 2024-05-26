@@ -14,14 +14,13 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from "vue";
 
-defineProps({
-   label: {
-      type: String,
-   },
-   offLabel: {
-      type: String,
-      default: null,
-   },
+type Props = {
+   label: string;
+   offLabel: string | null;
+};
+
+withDefaults(defineProps<Props>(), {
+   offLabel: null,
 });
 
 const emits = defineEmits(["switchToggled"]);

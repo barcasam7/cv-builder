@@ -1,22 +1,22 @@
 <template>
    <label>
-      <input type="color" class="color-picker" @input="$emit('colorChanged', $event.target.value)" :value="defaultColor" />
+      <input type="color" class="color-picker" @input="$emit('colorChanged', ($event.target as HTMLInputElement).value)" :value="defaultColor" />
       {{ label }}
    </label>
 </template>
 
-<script>
-export default {
-   props: {
-      label: {
-         type: String,
-         default: "Choose a color",
-      },
-      defaultColor: {
-         type: String,
-      },
-   },
+<script setup lang="ts">
+import { defineProps, defineEmits } from "vue";
+
+defineEmits(["colorChanged"]);
+type Props = {
+   label: string;
+   defaultColor: string | null;
 };
+
+withDefaults(defineProps<Props>(), {
+   label: "Choose a color",
+});
 </script>
 
 <style scoped>
