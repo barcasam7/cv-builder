@@ -4,22 +4,22 @@
    </button>
 </template>
 
-<script>
-export default {
-   props: {
-      btnType: {
-         type: String,
-         default: "",
-      },
-   },
-   computed: {
-      customClass() {
-         if (this.btnType) {
-            return "btn-" + this.btnType;
-         }
-      },
-   },
+<script setup lang="ts">
+import { computed } from "vue";
+
+type Props = {
+   btnType: string;
 };
+
+const props = withDefaults(defineProps<Props>(), {
+   btnType: "",
+});
+
+const customClass = computed(() => {
+   if (props.btnType) {
+      return "btn-" + props.btnType;
+   }
+});
 </script>
 
 <style scoped>

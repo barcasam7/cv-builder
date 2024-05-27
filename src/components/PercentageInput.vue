@@ -1,30 +1,23 @@
 <template>
    <label>
-      <input type="number" class="custom-input" :min="min" :max="max" :value="currentValue" @change="$emit('percentageChanged', $event.target.value)" />
+      <input type="number" class="custom-input" :min="min" :max="max" :value="currentValue" @change="$emit('percentageChanged', ($event.target as HTMLInputElement).value)" />
       % {{ label }}
    </label>
 </template>
 
-<script>
-export default {
-   props: {
-      label: {
-         type: String,
-      },
-      min: {
-         type: Number,
-         default: 0,
-      },
-      max: {
-         type: Number,
-         default: 100,
-      },
-      currentValue: {
-         type: Number,
-         default: 0,
-      },
-   },
+<script setup lang="ts">
+type Props = {
+   label: string;
+   min: number;
+   max: number;
+   currentValue: number;
 };
+
+withDefaults(defineProps<Props>(), {
+   min: 0,
+   max: 100,
+   currentValue: 0,
+});
 </script>
 
 <style scoped>

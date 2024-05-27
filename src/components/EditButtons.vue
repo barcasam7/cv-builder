@@ -7,25 +7,22 @@
    </button>
 </template>
 
-<script>
-export default {
-   props: {
-      showRemoveBtn: {
-         default: true,
-         type: Boolean,
-      },
-      showAddBtn: {
-         default: true,
-         type: Boolean,
-      },
-      textAdd: {
-         default: "+",
-      },
-      textRemove: {
-         default: "-",
-      },
-   },
+<script setup lang="ts">
+defineEmits(["addClick", "removeClick"]);
+
+type Props = {
+   showRemoveBtn: boolean;
+   showAddBtn: boolean;
+   textAdd: string;
+   textRemove: string;
 };
+
+withDefaults(defineProps<Props>(), {
+   showRemoveBtn: true,
+   showAddBtn: true,
+   textAdd: "+",
+   textRemove: "-",
+});
 </script>
 
 <style scoped>

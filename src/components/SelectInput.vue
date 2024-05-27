@@ -1,6 +1,6 @@
 <template>
    <label>
-      <select class="custom-input" @change="$emit('updateSelection', $event.target.value)">
+      <select class="custom-input" @change="$emit('updateSelection', ($event.target as HTMLSelectElement).value)">
          <option v-for="option in options" :value="option.value" :selected="defaultOption == option.value" :key="option.value">
             {{ option.name }}
          </option>
@@ -9,20 +9,14 @@
    </label>
 </template>
 
-<script>
-export default {
-   props: {
-      label: {
-         type: String,
-      },
-      options: {
-         type: Array,
-      },
-      defaultOption: {
-         type: String,
-      },
-   },
+<script setup lang="ts">
+type Props = {
+   label: string;
+   options: { name: string; value: string }[];
+   defaultOption: string;
 };
+
+defineProps<Props>();
 </script>
 
 <style scoped>
