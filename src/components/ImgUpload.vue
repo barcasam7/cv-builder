@@ -5,22 +5,20 @@
    </label>
 </template>
 
-<script>
-export default {
-   methods: {
-      changeImage(event) {
-         const selectedFile = event.target.files[0];
-         if (selectedFile) {
-            const reader = new FileReader();
+<script setup lang="ts">
+const emits = defineEmits(["imageChanged"]);
 
-            reader.addEventListener("load", () => {
-               this.$emit("imageChanged", reader.result);
-            });
+const changeImage = (event: Event) => {
+   const selectedFile = (event.target as HTMLInputElement).files?.[0];
+   if (selectedFile) {
+      const reader = new FileReader();
 
-            reader.readAsDataURL(selectedFile);
-         }
-      },
-   },
+      reader.addEventListener("load", () => {
+         emits("imageChanged", reader.result);
+      });
+
+      reader.readAsDataURL(selectedFile);
+   }
 };
 </script>
 

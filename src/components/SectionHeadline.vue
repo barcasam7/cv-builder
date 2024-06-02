@@ -4,22 +4,20 @@
    </h4>
 </template>
 
-<script>
-export default {
-   props: {
-      headline: {
-         type: String,
-      },
-      editing: {
-         type: Boolean,
-         default: true,
-      },
-   },
-   methods: {
-      notifyParent(event) {
-         this.$emit("headlineEdited", event.target.innerText);
-      },
-   },
+<script setup lang="ts">
+const emits = defineEmits(["headlineEdited"]);
+
+type Props = {
+   headline: string;
+   editing: boolean;
+};
+
+withDefaults(defineProps<Props>(), {
+   editing: true,
+});
+
+const notifyParent = (event: Event) => {
+   emits("headlineEdited", (event.target as HTMLElement).innerText);
 };
 </script>
 
