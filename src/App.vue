@@ -76,45 +76,45 @@
                   <SectionHeadline :headline="headlines[0]" @headline-edited="updateHeadline($event, 0)" :editing="editing" />
 
                   <div :contenteditable="editing" @input="updateProperty($event, 'introText')">
-                     {{ introText }}
+                     {{ resumeData.introText }}
                   </div>
                </ResumeSection>
 
                <ResumeSection>
                   <SectionHeadline :headline="headlines[1]" @headline-edited="updateHeadline($event, 1)" :editing="editing" />
 
-                  <Contact :contact="contact" @edit="updateNestedProperty" :editing="editing" :icon-color="colors.left.highlight" />
+                  <ContactComponent :contact="resumeData.contact" @edit="updateNestedProperty" :editing="editing" :icon-color="colors.left.highlight" />
                </ResumeSection>
 
                <ResumeSection>
                   <SectionHeadline :headline="headlines[2]" @headline-edited="updateHeadline($event, 2)" :editing="editing" />
 
                   <ul>
-                     <li v-for="(skill, index) in skills" :key="index" :contenteditable="editing" @input="updateNestedProperty($event, 'skills', index)">
+                     <li v-for="(skill, index) in resumeData.skills" :key="index" :contenteditable="editing" @input="updateArray($event, 'skills', index)">
                         {{ skill }}
                      </li>
                   </ul>
-                  <EditButtons @add-click="skills.push('new entry')" @remove-click="skills.pop()" :show-remove-btn="skills.length > 0" />
+                  <EditButtons @add-click="resumeData.skills.push('new entry')" @remove-click="resumeData.skills.pop()" :show-remove-btn="resumeData.skills.length > 0" />
                </ResumeSection>
 
                <ResumeSection>
                   <SectionHeadline :headline="headlines[3]" @headline-edited="updateHeadline($event, 3)" :editing="editing" />
                   <ul>
-                     <li v-for="(highlight, index) in highlights" :key="index" :contenteditable="editing" @input="updateNestedProperty($event, 'highlights', index)">
+                     <li v-for="(highlight, index) in resumeData.highlights" :key="index" :contenteditable="editing" @input="updateArray($event, 'highlights', index)">
                         {{ highlight }}
                      </li>
                   </ul>
-                  <EditButtons @add-click="highlights.push('new entry')" @remove-click="highlights.pop()" :show-remove-btn="highlights.length > 0" />
+                  <EditButtons @add-click="resumeData.highlights.push('new entry')" @remove-click="resumeData.highlights.pop()" :show-remove-btn="resumeData.highlights.length > 0" />
                </ResumeSection>
             </div>
 
             <div class="right-col">
                <div class="personal-name" :contenteditable="editing" @input="updateProperty($event, 'name')">
-                  {{ name }}
+                  {{ resumeData.name }}
                </div>
 
                <div class="personal-title" :contenteditable="editing" @input="updateProperty($event, 'title')">
-                  {{ title }}
+                  {{ resumeData.title }}
                </div>
 
                <ResumeSection>
@@ -192,10 +192,10 @@
    </main>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ResumeSection from "./components/ResumeSection.vue";
 import SectionHeadline from "./components/SectionHeadline.vue";
-import Contact from "./components/Contact.vue";
+import ContactComponent from "./components/Contact.vue";
 import EditButtons from "./components/EditButtons.vue";
 import ToggleSwitch from "./components/ToggleSwitch.vue";
 import Sidebar from "./components/Sidebar.vue";
@@ -205,8 +205,14 @@ import SelectInput from "./components/SelectInput.vue";
 import ImgUpload from "./components/ImgUpload.vue";
 import ExportPdf from "./components/ExportPdf.vue";
 import { ref, computed } from "vue";
+import { Colour, Education, Experience, Data } from "./types";
 
-const colors = ref({
+type Colours = {
+   left: Colour;
+   right: Colour;
+};
+
+const colors = ref<Colours>({
    left: {
       highlight: "#82c0cc",
       text: "#ffffff",
@@ -218,19 +224,28 @@ const colors = ref({
       background: "#ffffff",
    },
 });
-const name = ref("Sam Ward");
-const title = ref("Senior Software Engineer");
-const introText = ref("From data cleaning to data analysis to machine learning, I am passionate about everything data.");
-const imageUrl = ref("/profile_pic.jpg");
-const headlines = ref(["About me", "Contact", "Skills", "Certifications", "Experience", "Education"]);
-const contact = ref({
-   phone: "15713909584",
-   email: "contact@gmail.com",
-   address: "Main St 100, 19777 NY",
+
+type NestedProperty = "contact";
+type ArrayProperty = "skills" | "highlights";
+type DataStringProperty = Omit<Data, NestedProperty | ArrayProperty>;
+
+const resumeData = ref<Data>({
+   name: "Sam Ward",
+   title: "Senior Software Engineer",
+   introText:
+      "I'm a passionate software engineer with over 10 years of experience in building web applications and services. I specialize in full-stack development, with expertise in JavaScript, PHP, and Vue.",
+   contact: {
+      phone: "15713909584",
+      email: "contact@gmail.com",
+      address: "Main St 100, 19777 NY",
+   },
+   skills: ["PHP", "JavaScript", "Go", "SQL", "AWS", "Docker", "Typescript", "CSS", "HTML", "BigQuery", "Elasticsearch"],
+   highlights: ["Full-stack development", "Agile methodologies", "Cloud computing", "CI/CD pipelines"],
 });
-const skills = ref(["Python", "Pandas", "SQL", "R", "AI", "C++", "Machine Learning", "Hadoop", "TensorFlow", "PyTorch", "NLP"]);
-const highlights = ref(["Natural Language Processing with Python (Coursera)", "Recommendation Systems with TensorFlow on GCP (Google)"]);
-const experience = ref([
+
+const imageUrl = ref<string>("/profile_pic.png");
+const headlines = ref<string[]>(["About me", "Contact", "Skills", "Certifications", "Experience", "Education"]);
+const experience = ref<Experience[]>([
    {
       title: "Senior Data Scientist",
       company: "ABC Analytics Inc.",
@@ -262,7 +277,7 @@ const experience = ref([
    },
 ]);
 
-const education = ref([
+const education = ref<Education[]>([
    {
       title: "Master of Science in Data Science",
       university: "StellarTech University",
@@ -282,12 +297,12 @@ const education = ref([
    },
 ]);
 
-const editing = ref(true);
-const widthLeft = ref(30);
-const imageShape = ref("round");
-const headlineWeight = ref("400");
-const showImage = ref(true);
-const resumeFormat = ref("a4");
+const editing = ref<boolean>(true);
+const widthLeft = ref<number>(30);
+const imageShape = ref<string>("round");
+const headlineWeight = ref<string>("400");
+const showImage = ref<boolean>(true);
+const resumeFormat = ref<string>("a4");
 
 const cssVariables = computed(() => {
    return {
@@ -305,36 +320,46 @@ const percentageWidthLeft = computed(() => {
    return widthLeft.value + "%";
 });
 
-const updateHeadline = (newValue, index) => {
+const updateHeadline = (newValue: string, index: number) => {
    headlines.value[index] = newValue;
 };
 
-const updateProperty = (event, key) => {
-   this[key] = event.target.innerText;
+const updateProperty = (event: Event, key: keyof DataStringProperty) => {
+   resumeData.value[key] = (event.target as HTMLDivElement).innerText;
 };
 
-const updateNestedProperty = (event, key1, key2) => {
-   this[key1][key2] = event.target.innerText;
+const updateArray = (event: Event, key: "skills" | "highlights", index: number) => {
+   resumeData.value[key][index] = (event.target as HTMLDivElement).innerText;
 };
 
-const updateExperience = (event, key, index) => {
-   experience.value[index][key] = event.target.innerText;
+const updateNestedProperty = (event: Event, key1: NestedProperty, key2: keyof Data[NestedProperty]) => {
+   resumeData.value[key1][key2] = (event.target as HTMLElement).innerText;
 };
 
-const updateExperienceDescription = (event, index1, index2) => {
-   experience.value[index1]["description"][index2] = event.target.innerText;
+const updateExperience = (event: Event, key: keyof Experience, index: number) => {
+   if (key === "description") {
+      return;
+   }
+   experience.value[index][key] = (event.target as HTMLElement).innerText;
 };
 
-const updateEducation = (event, key, index) => {
-   education.value[index][key] = event.target.innerText;
+const updateExperienceDescription = (event: Event, index1: number, index2: number) => {
+   experience.value[index1]["description"][index2] = (event.target as HTMLElement).innerText;
 };
 
-const updateEducationDescription = (event, index1, index2) => {
-   education.value[index1]["description"][index2] = event.target.innerText;
+const updateEducation = (event: Event, key: keyof Education, index: number) => {
+   if (key === "description") {
+      return;
+   }
+   education.value[index][key] = (event.target as HTMLElement).innerText;
+};
+
+const updateEducationDescription = (event: Event, index1: number, index2: number) => {
+   education.value[index1]["description"][index2] = (event.target as HTMLElement).innerText;
 };
 
 const addExperience = () => {
-   experience.unshift({
+   experience.value.unshift({
       title: "Job Title",
       company: "Company",
       location: "Location",
@@ -344,7 +369,7 @@ const addExperience = () => {
 };
 
 const addEducation = () => {
-   education.unshift({
+   education.value.unshift({
       title: "Education title",
       university: "University",
       location: "Location",
@@ -353,19 +378,19 @@ const addEducation = () => {
    });
 };
 
-const removeExperience = (index) => {
+const removeExperience = (index: number) => {
    experience.value.splice(index, 1);
 };
 
-const removeEducation = (index) => {
+const removeEducation = (index: number) => {
    education.value.splice(index, 1);
 };
 
-const toggleEditMode = (isChecked) => {
+const toggleEditMode = (isChecked: boolean) => {
    editing.value = isChecked;
 };
 
-const toggleImageDisplay = (isChecked) => {
+const toggleImageDisplay = (isChecked: boolean) => {
    showImage.value = isChecked;
 };
 </script>
