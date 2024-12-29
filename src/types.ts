@@ -1,10 +1,14 @@
 export type Data = {
+   imageUrl: string;
    name: string;
    title: string;
    introText: string;
    contact: Contact;
    skills: string[];
    highlights: string[];
+   headlines: string[];
+   experience: Experience[];
+   education: Education[];
 };
 
 export type Contact = {
